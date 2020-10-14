@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import restaurantsReducer from '../restaurants/reducers';
-import { loadRestaurants } from '../restaurants/actions';
+import { loadRestaurants, createRestaurant } from '../restaurants/actions';
 
 describe('restaurants', () => {
   describe('loadRestaurants action', () => {
@@ -98,6 +98,58 @@ describe('restaurants', () => {
 
       it('does not have the loadError flag set', () => {
         expect(store.getState().loadError).toEqual(false);
+      });
+    });
+  });
+  describe('create restaurant action', () => {
+    const newRestaurantName = 'Sushi Place';
+    const existingRestaurant = { id: 1, name: 'Pizza Place' };
+    const responseRestaurant = { id: 2, name: newRestaurantName };
+
+    let api;
+    let store;
+    let promise;
+
+    beforeEach(() => {
+      api = {
+        createRestaurant: jest.fn().mockName('createRestaurant'),
+      };
+      const initialState = { records: [existingRestaurant] };
+
+      store = createStore(
+        restaurantsReducer,
+        initialState,
+        applyMiddleware(thunk.withExtraArgument(api)),
+      );
+    });
+
+    it('save restaurant to server', () => {
+      api.createRestaurant.mockResolvedValue(responseRestaurant);
+      store.dispatch(createRestaurant(newRestaurantName));
+      expect(api.createRestaurant).toHaveBeenCalledWith(newRestaurantName);
+    });
+    describe('when save fails', () => {
+      it('reject', () => {
+        api.createRestaurant.mockRejectedValue();
+        promise = store.dispatch(createRestaurant(newRestaurantName));
+        return expect(promise).resolves.toBeUndefined();
+      });
+    });
+    describe('when save succeeds', () => {
+      beforeEach(() => {
+        api.createRestaurant.mockResolvedValue(responseRestaurant);
+        promise = store.dispatch(createRestaurant(newRestaurantName));
+      });
+
+      it('stores the returned restaurant in the store', () => {
+        expect(store.getState().records).toEqual([
+          existingRestaurant,
+          responseRestaurant,
+        ]);
+      });
+
+      it('resolves', () => {
+        return expect(promise).resolves.toBeUndefined();
       });
     });
   });

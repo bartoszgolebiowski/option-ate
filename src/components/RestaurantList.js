@@ -16,7 +16,7 @@ export const RestaurantList = ({
   useEffect(() => {
     loadRestaurants();
   }, [loadRestaurants]);
-
+  
   return (
     <>
       {loading && <CircularProgress data-testid="loading-indicator" />}
