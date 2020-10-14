@@ -44,6 +44,7 @@
     "eslint-plugin-cypress": "^2.11.2",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "flush-promises": "^1.0.2",
     "prettier": "^2.1.2",
     "react-scripts": "3.4.3",
     "react-testing-library": "^8.0.1"
